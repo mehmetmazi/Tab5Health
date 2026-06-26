@@ -1,0 +1,17 @@
+# ESP-IDF build output & local config
+/build/
+build.log
+sdkconfig
+sdkconfig.old
+
+# Managed components are fetched on build from the component registry
+/managed_components/
+dependencies.lock
+
+# Secrets — never commit
+main/wifi_credentials.h
+main/oura_credentials.h
+main/withings_credentials.h
+
+# macOS
+.DS_Store

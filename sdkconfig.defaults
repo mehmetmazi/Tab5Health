@@ -1,0 +1,61 @@
+# =============================================================================
+# Tab5 (ESP32-P4) project defaults — M5GFX display path.
+# Regenerate sdkconfig after editing: rm sdkconfig && idf.py build
+# =============================================================================
+
+CONFIG_IDF_TARGET="esp32p4"
+
+# Tab5 has 16 MB flash.
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+
+# Custom partition table: 4 MB app + 2 MB SPIFFS (see partitions.csv).
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# This unit's P4 silicon is rev v1.3.
+CONFIG_ESP32P4_SELECTS_REV_LESS_V3=y
+
+# PSRAM (ESP32-P4, 32 MB) — M5GFX requires it at 200 MHz for the framebuffer.
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_SPEED_200M=y
+CONFIG_IDF_EXPERIMENTAL_FEATURES=y
+
+# Match M5Stack's working Tab5 config: execute code/rodata from PSRAM (XIP, via L2
+# cache) so internal RAM isn't exhausted. Without this, adding the networking stack
+# pushes the 2nd core's idle-task stack into TCM, which fails the P4 stack-validity
+# check → boot loop. (esp_hosted + 200MHz-PSRAM both need the headroom XIP frees.)
+CONFIG_SPIRAM_XIP_FROM_PSRAM=y
+CONFIG_CACHE_L2_CACHE_256KB=y
+CONFIG_CACHE_L2_CACHE_LINE_128B=y
+
+# --- LVGL 9 (rendered on top of M5GFX) ---
+CONFIG_LV_CONF_SKIP=y
+CONFIG_LV_COLOR_DEPTH_16=y
+CONFIG_LV_USE_CLIB_MALLOC=y
+CONFIG_LV_USE_CLIB_SPRINTF=y
+CONFIG_LV_USE_CLIB_STRING=y
+CONFIG_LV_FONT_MONTSERRAT_28=y
+CONFIG_LV_FONT_MONTSERRAT_48=y
+
+# --- Networking: esp-hosted to the ESP32-C6 over SDIO (Tab5 wiring) ---
+# Co-processor is the C6; not a known dev board, so custom GPIOs; SDIO slot 1.
+CONFIG_ESP_HOSTED_CP_TARGET_ESP32C6=y
+CONFIG_ESP_HOSTED_P4_DEV_BOARD_NONE=y
+CONFIG_ESP_HOSTED_SDIO_HOST_INTERFACE=y
+CONFIG_ESP_HOSTED_SDIO_SLOT_1=y
+# Tab5 SDIO2 pins (the settable per-slot keys; CONFIG_..._SDIO_PIN_* are derived)
+CONFIG_ESP_HOSTED_PRIV_SDIO_PIN_CLK_SLOT_1=12
+CONFIG_ESP_HOSTED_PRIV_SDIO_PIN_CMD_SLOT_1=13
+CONFIG_ESP_HOSTED_PRIV_SDIO_PIN_D0_SLOT_1=11
+CONFIG_ESP_HOSTED_PRIV_SDIO_PIN_D1_4BIT_BUS_SLOT_1=10
+CONFIG_ESP_HOSTED_PRIV_SDIO_PIN_D2_4BIT_BUS_SLOT_1=9
+CONFIG_ESP_HOSTED_PRIV_SDIO_PIN_D3_4BIT_BUS_SLOT_1=8
+CONFIG_ESP_HOSTED_SDIO_GPIO_RESET_SLAVE=15
+
+# TLS: validate HTTPS server certs against the bundled CA roots (esp_crt_bundle).
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y
+
+# Provider fetches (mbedtls TLS handshake + cJSON parse) run in the main task.
+# The 3584-byte default overflows during back-to-back TLS — give it headroom.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=16384

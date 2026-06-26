@@ -1,0 +1,19 @@
+# Managed component dependencies (pulled from the ESP Component Registry).
+dependencies:
+  idf: ">=5.4"
+
+  # M5GFX drives the Tab5's display + touch. We use it instead of the official
+  # espressif/m5stack_tab5 BSP because esp_lcd's MIPI-DSI path does NOT render on
+  # the new ST7123 panel revision (board v2) — see esp-bsp#695. M5GFX's own panel
+  # init works. LVGL renders on top via a flush callback (added in a later stage).
+  # https://components.espressif.com/components/m5stack/m5gfx
+  m5stack/m5gfx: "^0.2.24"
+
+  # LVGL 9 — UI toolkit, rendered into M5GFX via a flush callback.
+  lvgl/lvgl: "^9.2.0"
+
+  # Networking: P4 has no radio — Wi-Fi routes to the ESP32-C6 over esp-hosted
+  # (SDIO). esp_wifi_remote exposes the standard esp_wifi_* API; esp_hosted is
+  # the SDIO transport to the C6 (which ships with esp-hosted slave fw).
+  espressif/esp_wifi_remote: "*"
+  espressif/esp_hosted: "*"
