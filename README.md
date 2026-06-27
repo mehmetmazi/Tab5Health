@@ -34,6 +34,30 @@ from whatever `python3` is on `PATH`. Always enter the env via the helper:
 - ESP-IDF: `~/esp/esp-idf` (v5.4.2). macOS host tools (`cmake ninja dfu-util ccache`)
   are from Homebrew — ESP-IDF doesn't bundle them on macOS.
 
+## Credentials
+
+The three credential headers are gitignored. Copy the templates and fill in your own:
+
+```sh
+cd main
+cp wifi_credentials.h.example     wifi_credentials.h
+cp oura_credentials.h.example     oura_credentials.h
+cp withings_credentials.h.example withings_credentials.h
+```
+
+- **Wi-Fi** — your SSID + password.
+- **Oura** — a Personal Access Token from
+  [cloud.ouraring.com/personal-access-tokens](https://cloud.ouraring.com/personal-access-tokens)
+  (no OAuth needed).
+- **Withings** — register an app at [developer.withings.com](https://developer.withings.com)
+  with callback `http://localhost:8080/callback`, then run the one-time browser
+  authorization on your computer to get an initial **refresh token** — the device
+  refreshes and rotates it from there (stored in NVS). Put the client id, client
+  secret, and that refresh token in `withings_credentials.h`.
+
+Weather (Open-Meteo) needs no key — to change the location, edit `LAT` / `LON` in
+[`components/providers/weather.cpp`](components/providers/weather.cpp).
+
 ## Build / flash / monitor
 
 ```sh
@@ -56,7 +80,7 @@ partitions.csv        16MB: 4MB app + 2MB SPIFFS
 main/
   main.cpp            display + battery init, then a 10-min loop: connect → fetch
                       Oura + Withings → read battery → refresh tiles
-  *_credentials.h     GITIGNORED secrets (wifi / oura / withings)
+  *_credentials.h     GITIGNORED secrets — copy from the *.example templates
 components/
   display/            M5GFX + LVGL bring-up; display_lock()/unlock(); LVGL task
   model/              HealthSnapshot (decoupled data struct) + Source enum
@@ -97,3 +121,7 @@ components/
   I2C bus wedges under network load — rebuild the bus on a failed read.
 - **`app_main` must not return** — keep it in an infinite loop, or the idle-task
   stack overflows during cleanup.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
