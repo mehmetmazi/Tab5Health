@@ -1,0 +1,14 @@
+# Cloudflare Worker config for the Apple Health -> Tab5 bridge.
+# Deploy with:  wrangler deploy   (after the two steps below)
+name = "tab5-health-bridge"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# 1. Create the KV namespace, then paste its id here:
+#      wrangler kv namespace create HEALTH
+kv_namespaces = [
+  { binding = "HEALTH", id = "<your-kv-namespace-id>" }
+]
+
+# 2. Set the shared secret (do NOT put the token in this file):
+#      wrangler secret put BRIDGE_TOKEN
