@@ -12,6 +12,7 @@ dependencies.lock
 main/wifi_credentials.h
 main/oura_credentials.h
 main/withings_credentials.h
+main/applehealth_credentials.h
 
 # macOS
 .DS_Store
